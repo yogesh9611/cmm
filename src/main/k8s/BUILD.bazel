@@ -1,0 +1,78 @@
+load("@wfa_rules_cue//cue:defs.bzl", "cue_library")
+
+package(default_visibility = ["//src/main/k8s:__subpackages__"])
+
+cue_library(
+    name = "base",
+    srcs = ["base.cue"],
+)
+
+cue_library(
+    name = "open_telemetry",
+    srcs = ["open_telemetry.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "grafana",
+    srcs = ["grafana.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "spanner",
+    srcs = ["spanner.cue"],
+)
+
+cue_library(
+    name = "resource_setup",
+    srcs = ["resource_setup.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "panel_match_resource_setup",
+    srcs = ["panel_match_resource_setup.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "kingdom",
+    srcs = ["kingdom.cue"],
+    deps = [
+        ":base",
+        ":spanner",
+    ],
+)
+
+cue_library(
+    name = "duchy",
+    srcs = ["duchy.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "frontend_simulator",
+    srcs = ["frontend_simulator.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "edp_simulator",
+    srcs = ["edp_simulator.cue"],
+    deps = [":base"],
+)
+
+cue_library(
+    name = "postgres",
+    srcs = ["postgres.cue"],
+)
+
+cue_library(
+    name = "reporting",
+    srcs = ["reporting.cue"],
+    deps = [
+        ":base",
+        ":postgres",
+    ],
+)

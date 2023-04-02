@@ -1,0 +1,476 @@
+load("@rules_java//java:defs.bzl", "java_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@wfa_common_jvm//build:macros.bzl", "kt_jvm_grpc_proto_library")
+load("@wfa_common_jvm//build/kt_jvm_proto:defs.bzl", "kt_jvm_proto_library")
+load("//src/main/proto/wfa/measurement/internal/common:macros.bzl", "IMPORT_PREFIX", "proto_and_java_proto_library")
+
+package(default_visibility = ["//:__subpackages__"])
+
+proto_and_java_proto_library(
+    name = "account",
+)
+
+proto_library(
+    name = "accounts_service_proto",
+    srcs = ["accounts_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":account_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "accounts_service_kt_jvm_grpc_proto",
+    srcs = [":accounts_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "api_key",
+)
+
+proto_library(
+    name = "api_keys_service_proto",
+    srcs = ["api_keys_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":api_key_proto",
+        ":measurement_consumer_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "api_keys_service_kt_jvm_grpc_proto",
+    srcs = [":api_keys_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "computation_participant",
+    deps = [
+        ":certificate_proto",
+        ":duchy_measurement_log_entry_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "data_provider",
+    deps = [":certificate_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "model_provider",
+    deps = [":certificate_proto"],
+)
+
+proto_library(
+    name = "computation_participants_service_proto",
+    srcs = ["computation_participants_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":computation_participant_proto",
+        ":duchy_measurement_log_entry_proto",
+        ":measurement_log_entry_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "computation_participants_service_kt_jvm_grpc_proto",
+    srcs = [":computation_participants_service_proto"],
+)
+
+proto_library(
+    name = "data_providers_service_proto",
+    srcs = ["data_providers_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":data_provider_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "data_providers_service_kt_jvm_grpc_proto",
+    srcs = [":data_providers_service_proto"],
+)
+
+proto_library(
+    name = "model_providers_service_proto",
+    srcs = ["model_providers_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":model_provider_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "model_providers_service_kt_jvm_grpc_proto",
+    srcs = [":model_providers_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "certificate",
+    deps = [
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "certificates_service_proto",
+    srcs = ["certificates_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":certificate_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "certificates_service_kt_jvm_grpc_proto",
+    srcs = [":certificates_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "crypto",
+)
+
+proto_and_java_proto_library(
+    name = "differential_privacy",
+)
+
+proto_and_java_proto_library(
+    name = "duchy_protocol_config",
+    deps = [
+        ":differential_privacy_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "protocol_config",
+    deps = [
+        ":differential_privacy_proto",
+    ],
+)
+
+proto_library(
+    name = "duchy_id_config_proto",
+    srcs = ["duchy_id_config.proto"],
+    deps = [
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+java_proto_library(
+    name = "duchy_id_config_java_proto",
+    deps = [":duchy_id_config_proto"],
+)
+
+kt_jvm_proto_library(
+    name = "duchy_id_config_kt_jvm_proto",
+    srcs = [":duchy_id_config_proto"],
+    deps = [":duchy_id_config_java_proto"],
+)
+
+proto_library(
+    name = "llv2_protocol_config_config_proto",
+    srcs = ["llv2_protocol_config_config.proto"],
+    deps = [
+        ":duchy_protocol_config_proto",
+        ":protocol_config_proto",
+    ],
+)
+
+java_proto_library(
+    name = "llv2_protocol_config_config_java_proto",
+    deps = [":llv2_protocol_config_config_proto"],
+)
+
+kt_jvm_proto_library(
+    name = "llv2_protocol_config_config_kt_jvm_proto",
+    srcs = [":llv2_protocol_config_config_proto"],
+    deps = [":llv2_protocol_config_config_java_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "event_group",
+    deps = [
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "event_groups_service_proto",
+    srcs = ["event_groups_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":event_group_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "event_groups_service_kt_jvm_grpc_proto",
+    srcs = [":event_groups_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "event_group_metadata_descriptor",
+    deps = ["@com_google_protobuf//:descriptor_proto"],
+)
+
+proto_library(
+    name = "event_group_metadata_descriptors_service_proto",
+    srcs = ["event_group_metadata_descriptors_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":event_group_metadata_descriptor_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "event_group_metadata_descriptors_service_kt_jvm_grpc_proto",
+    srcs = [":event_group_metadata_descriptors_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "exchange",
+    deps = [
+        ":exchange_details_proto",
+        "@com_google_googleapis//google/type:date_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "exchange_details",
+)
+
+proto_library(
+    name = "exchanges_service_proto",
+    srcs = ["exchanges_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":exchange_proto",
+        "//src/main/proto/wfa/measurement/internal/common:provider_proto",
+        "@com_google_googleapis//google/type:date_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "exchanges_service_kt_jvm_grpc_proto",
+    srcs = [":exchanges_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "exchange_step",
+    deps = [
+        "//src/main/proto/wfa/measurement/internal/common:provider_proto",
+        "@com_google_googleapis//google/type:date_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "exchange_steps_service_proto",
+    srcs = ["exchange_steps_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":exchange_step_proto",
+        "//src/main/proto/wfa/measurement/internal/common:provider_proto",
+        "@com_google_googleapis//google/type:date_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "exchange_steps_service_kt_jvm_grpc_proto",
+    srcs = [":exchange_steps_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "exchange_step_attempt",
+    deps = [
+        ":exchange_step_attempt_details_proto",
+        "@com_google_googleapis//google/type:date_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "exchange_step_attempt_details",
+    deps = [
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "exchange_step_attempts_service_proto",
+    srcs = ["exchange_step_attempts_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":exchange_step_attempt_details_proto",
+        ":exchange_step_attempt_proto",
+        "//src/main/proto/wfa/measurement/internal/common:provider_proto",
+        "@com_google_googleapis//google/type:date_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "exchange_step_attempts_service_kt_jvm_grpc_proto",
+    srcs = [":exchange_step_attempts_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "measurement",
+    deps = [
+        ":certificate_proto",
+        ":computation_participant_proto",
+        ":duchy_protocol_config_proto",
+        ":protocol_config_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "measurements_service_proto",
+    srcs = ["measurements_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":measurement_proto",
+        "@com_google_protobuf//:empty_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "measurements_service_kt_jvm_grpc_proto",
+    srcs = [":measurements_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "measurement_consumer",
+    deps = [":certificate_proto"],
+)
+
+proto_library(
+    name = "measurement_consumers_service_proto",
+    srcs = ["measurement_consumers_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":measurement_consumer_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "measurement_consumers_service_kt_jvm_grpc_proto",
+    srcs = [":measurement_consumers_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "measurement_log_entry",
+    deps = [
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "duchy_measurement_log_entry",
+    deps = [
+        ":measurement_log_entry_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "state_transition_measurement_log_entry",
+    deps = [
+        ":measurement_log_entry_proto",
+        ":measurement_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+proto_library(
+    name = "measurement_log_entries_service_proto",
+    srcs = ["measurement_log_entries_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":duchy_measurement_log_entry_proto",
+        ":measurement_log_entry_proto",
+        ":state_transition_measurement_log_entry_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "measurement_log_entries_service_kt_jvm_grpc_proto",
+    srcs = [":measurement_log_entries_service_proto"],
+)
+
+proto_library(
+    name = "public_keys_service_proto",
+    srcs = ["public_keys_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+)
+
+kt_jvm_grpc_proto_library(
+    name = "public_keys_service_kt_jvm_grpc_proto",
+    srcs = [":public_keys_service_proto"],
+)
+
+proto_and_java_proto_library(
+    name = "recurring_exchange",
+    deps = [
+        ":recurring_exchange_details_proto",
+        "@com_google_googleapis//google/type:date_proto",
+    ],
+)
+
+proto_and_java_proto_library(
+    name = "recurring_exchange_details",
+    deps = [
+        ":exchange_workflow_proto",
+    ],
+)
+
+proto_library(
+    name = "recurring_exchanges_service_proto",
+    srcs = ["recurring_exchanges_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [":recurring_exchange_proto"],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "recurring_exchanges_service_kt_jvm_grpc_proto",
+    srcs = [":recurring_exchanges_service_proto"],
+)
+
+proto_library(
+    name = "requisitions_service_proto",
+    srcs = ["requisitions_service.proto"],
+    strip_import_prefix = IMPORT_PREFIX,
+    deps = [
+        ":measurement_proto",
+        "@com_google_protobuf//:timestamp_proto",
+    ],
+)
+
+kt_jvm_grpc_proto_library(
+    name = "requisitions_service_kt_jvm_grpc_proto",
+    srcs = [":requisitions_service_proto"],
+)
+
+proto_and_java_proto_library(name = "exchange_workflow")
+
+proto_library(
+    name = "error_code_proto",
+    srcs = ["error_code.proto"],
+    deps = [
+        "@com_google_googleapis//google/rpc:error_details_proto",
+    ],
+)
+
+java_proto_library(
+    name = "error_code_java_proto",
+    deps = [":error_code_proto"],
+)
+
+kt_jvm_proto_library(
+    name = "error_code_kt_jvm_proto",
+    srcs = [":error_code_proto"],
+    deps = [":error_code_java_proto"],
+)

@@ -1,0 +1,140 @@
+// Copyright 2021 The Cross-Media Measurement Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+package wfa.measurement.system.v1alpha;
+
+import "google/api/resource.proto";
+import "wfa/measurement/system/v1alpha/computation_participant.proto";
+import "wfa/measurement/system/v1alpha/differential_privacy.proto";
+import "wfa/measurement/system/v1alpha/requisition.proto";
+
+option java_package = "org.wfanet.measurement.system.v1alpha";
+option java_multiple_files = true;
+option java_outer_classname = "ComputationProto";
+
+message Computation {
+  option (google.api.resource) = {
+    type: "halo-system.wfanet.org/Computation"
+    pattern: "computations/{computation}"
+  };
+
+  // Resource name. Output-only. Immutable.
+  string name = 1;
+
+  // Public API version for serialized messages. Required. Immutable.
+  string public_api_version = 2;
+
+  // Serialized `MeasurementSpec` from public API. Required. Immutable.
+  bytes measurement_spec = 3;
+
+  // State of a `Computation`.
+  enum State {
+    STATE_UNSPECIFIED = 0;
+
+    // Awaiting the necessary parameters from computation participants (Duchies)
+    // before Requisitions may be made available in the public API.
+    PENDING_REQUISITION_PARAMS = 1;
+
+    // Awaiting fulfillment of all Requisitions by Data Providers.
+    //
+    // Requisitions are available in the public API at this state.
+    PENDING_REQUISITION_FULFILLMENT = 2;
+
+    // Awaiting confirmation from computation participants (Duchies).
+    //
+    // Requisitions are all fulfilled at this state.
+    PENDING_PARTICIPANT_CONFIRMATION = 3;
+
+    // Awaiting completion of computation by participants (Duchies).
+    //
+    // Requisitions are all fulfilled at this state.
+    PENDING_COMPUTATION = 4;
+
+    // Completed successfully (has a result). Terminal state.
+    SUCCEEDED = 5;
+
+    // Completed unsuccessfully. Terminal state.
+    FAILED = 6;
+
+    // Cancelled by Measurement Consumer. Terminal state.
+    CANCELLED = 7;
+  }
+  // State of this `Computation`. Output-only.
+  State state = 6;
+
+  // Resource name of a `Certificate` belonging to the aggregator `Duchy`. Must
+  // be set if `state` is `SUCCEEDED`.
+  string aggregator_certificate = 7
+      [(google.api.resource_reference).type = "halo.wfanet.org/Certificate"];
+
+  // Encrypted `SignedData` message from the public API containing a serialized
+  // `Result` message from the public API, which can be verified using
+  // `aggregator_certificate`. Must be set if `state` is `SUCCEEDED`.
+  bytes encrypted_result = 8;
+
+  // Denormalized child `ComputationParticipant` resources. Output-only.
+  repeated ComputationParticipant computation_participants = 9;
+
+  // Denormalized child `Requisition` resources. Output-only.
+  repeated Requisition requisitions = 10;
+
+  // MPC Protocol configuration that need to be known by Duchies.
+  message MpcProtocolConfig {
+    // Configuration for the Liquid Legions v2 R/F protocol.
+    message LiquidLegionsV2 {
+      // Parameters for a Liquid Legions sketch.
+      message LiquidLegionsSketchParams {
+        // The decay rate of the Liquid Legions sketch.
+        double decay_rate = 1;
+
+        // The maximum size of the Liquid Legions sketch.
+        int64 max_size = 2;
+      }
+      LiquidLegionsSketchParams sketch_params = 1;
+
+      // Configuration for noises added by the MPC workers to protect
+      // intermediate results. These noises don't affect the final output.
+      message MpcNoise {
+        // DP params for the blind histogram noise register.
+        // Each of these registers contains a random register id, the same
+        // constant key indicating that the register is destroyed, and an
+        // arbitrary count value.
+        DifferentialPrivacyParams blinded_histogram_noise = 1;
+        // DP params for the noise for the publisher noise registers.
+        // Each of these registers contains a well-known constant register id,
+        // and arbitrary key and count values.
+        DifferentialPrivacyParams noise_for_publisher_noise = 2;
+      }
+      MpcNoise mpc_noise = 2;
+
+      // ID of the OpenSSL built-in elliptic curve. For example, 415 for the
+      // prime256v1 curve. Required. Immutable.
+      int32 elliptic_curve_id = 3;
+
+      // The maximum frequency to reveal in the histogram.
+      int32 maximum_frequency = 4;
+    }
+
+    // Configuration for the specific protocol.
+    oneof protocol {
+      // Liquid Legions v2 config.
+      //
+      // May only be set when the measurement type is REACH_AND_FREQUENCY.
+      LiquidLegionsV2 liquid_legions_v2 = 1;
+    }
+  }
+  MpcProtocolConfig mpc_protocol_config = 11;
+}
